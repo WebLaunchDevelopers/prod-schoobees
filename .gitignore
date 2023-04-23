@@ -30,3 +30,5 @@ __pycache__/
 *.pg_dump
 *.pg_dumpall
 *.pg_restore
+
+staticfiles
