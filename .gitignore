@@ -1,0 +1,23 @@
+# Ignore compiled Python files
+# *.pyc
+
+# Ignore local development settings
+# local_settings.py
+
+# Ignore any log files
+# *.log
+
+# Ignore database files
+# db.sqlite3
+
+# *.sqlite3
+
+# Ignore any generated documentation
+# docs/_build/
+
+#cache files
+# __pycache__/
+
+# Ignore all files in Django's migrations directory except __init__.py
+# **/migrations/*
+# !**/migrations/__init__.py
