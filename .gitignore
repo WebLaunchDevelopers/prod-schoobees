@@ -32,3 +32,4 @@ __pycache__/
 *.pg_restore
 
 staticfiles
+static
