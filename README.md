@@ -1,2 +1,0 @@
-# prod-schoobees
-production schoobees
