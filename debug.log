@@ -1,0 +1,103 @@
+INFO 2023-04-24 01:12:03,179 Watching for file changes with StatReloader
+INFO 2023-04-24 01:12:22,618 "GET / HTTP/1.1" 302 0
+INFO 2023-04-24 01:12:23,073 "GET /accounts/login/?next=/ HTTP/1.1" 200 4827
+INFO 2023-04-24 01:12:23,315 "GET /static/plugins/fontawesome-free/css/all.min.css HTTP/1.1" 200 367
+INFO 2023-04-24 01:12:23,457 "GET /static/plugins/toastr/toastr.min.css HTTP/1.1" 200 367
+INFO 2023-04-24 01:12:23,505 "GET /static/plugins/overlayScrollbars/css/OverlayScrollbars.min.css HTTP/1.1" 200 367
+INFO 2023-04-24 01:12:23,508 "GET /static/dist/css/adminlte.min.css HTTP/1.1" 200 367
+INFO 2023-04-24 01:12:23,512 "GET /static/dist/css/login-page.css HTTP/1.1" 200 367
+INFO 2023-04-24 01:12:23,523 "GET /static/plugins/jquery/jquery.min.js HTTP/1.1" 200 367
+INFO 2023-04-24 01:12:23,744 "GET /static/dist/js/jquery.formset.js HTTP/1.1" 200 367
+INFO 2023-04-24 01:12:23,884 "GET /static/plugins/bootstrap/js/bootstrap.bundle.min.js HTTP/1.1" 200 367
+INFO 2023-04-24 01:12:23,924 "GET /static/plugins/toastr/toastr.min.js HTTP/1.1" 200 367
+INFO 2023-04-24 01:12:23,947 "GET /static/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js HTTP/1.1" 200 367
+INFO 2023-04-24 01:12:23,950 "GET /static/dist/js/adminlte.js HTTP/1.1" 200 367
+INFO 2023-04-24 01:12:23,968 "GET /static/dist/js/demo.js HTTP/1.1" 200 367
+INFO 2023-04-24 01:12:24,180 "GET /static/dist/img/login.png HTTP/1.1" 200 367
+INFO 2023-04-24 01:12:24,621 "GET /favicon.ico HTTP/1.1" 200 367
+WARNING 2023-04-24 02:33:34,049 Not Found: /robots.txt
+WARNING 2023-04-24 07:04:05,662 Not Found: /wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 07:04:05,858 Not Found: /xmlrpc.php
+WARNING 2023-04-24 07:04:06,247 Not Found: /blog/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 07:04:06,444 Not Found: /web/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 07:04:06,636 Not Found: /wordpress/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 07:04:06,829 Not Found: /website/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 07:04:07,026 Not Found: /wp/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 07:04:07,216 Not Found: /news/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 07:04:07,403 Not Found: /2020/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 07:04:07,601 Not Found: /2019/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 07:04:07,796 Not Found: /shop/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 07:04:07,985 Not Found: /wp1/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 07:04:08,178 Not Found: /test/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 07:04:08,368 Not Found: /wp2/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 07:04:08,559 Not Found: /site/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 07:04:08,748 Not Found: /cms/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 07:04:08,937 Not Found: /sito/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 10:43:05,588 Not Found: /wp-login.php
+WARNING 2023-04-24 10:53:36,233 Not Found: /robots.txt
+WARNING 2023-04-24 10:53:36,498 Not Found: /ads.txt
+WARNING 2023-04-24 12:41:06,155 Not Found: /wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 12:41:06,409 Not Found: /xmlrpc.php
+WARNING 2023-04-24 12:41:06,800 Not Found: /blog/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 12:41:06,999 Not Found: /web/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 12:41:07,222 Not Found: /wordpress/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 12:41:07,441 Not Found: /website/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 12:41:07,638 Not Found: /wp/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 12:41:07,839 Not Found: /news/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 12:41:08,038 Not Found: /2018/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 12:41:08,236 Not Found: /2019/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 12:41:08,434 Not Found: /shop/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 12:41:08,632 Not Found: /wp1/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 12:41:08,831 Not Found: /test/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 12:41:09,028 Not Found: /media/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 12:41:09,225 Not Found: /wp2/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 12:41:09,422 Not Found: /site/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 12:41:09,621 Not Found: /cms/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 12:41:09,819 Not Found: /sito/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 18:24:25,978 Not Found: /wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 18:24:26,171 Not Found: /xmlrpc.php
+WARNING 2023-04-24 18:24:26,560 Not Found: /blog/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 18:24:26,756 Not Found: /web/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 18:24:26,946 Not Found: /wordpress/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 18:24:27,135 Not Found: /website/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 18:24:27,328 Not Found: /wp/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 18:24:27,515 Not Found: /news/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 18:24:27,702 Not Found: /2020/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 18:24:27,897 Not Found: /2019/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 18:24:28,084 Not Found: /shop/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 18:24:28,271 Not Found: /wp1/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 18:24:28,474 Not Found: /test/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 18:24:28,685 Not Found: /wp2/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 18:24:28,876 Not Found: /site/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 18:24:29,063 Not Found: /cms/wp-includes/wlwmanifest.xml
+WARNING 2023-04-24 18:24:29,250 Not Found: /sito/wp-includes/wlwmanifest.xml
+INFO 2023-04-24 22:04:11,494 Watching for file changes with StatReloader
+INFO 2023-04-24 22:04:22,859 code 400, message Bad request version ('\x00\x02\x01\x00\x00')
+ERROR 2023-04-24 22:04:22,860 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2023-04-24 22:04:23,265 code 400, message Bad request syntax ("\x16\x03\x01\x02\x00\x01\x00\x01ü\x03\x03ú^~ø'Ï")
+ERROR 2023-04-24 22:04:23,265 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2023-04-24 22:04:29,781 code 400, message Bad request version ('\x02h2\x08http/1.1\x00')
+ERROR 2023-04-24 22:04:29,781 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2023-04-24 22:04:30,215 code 400, message Bad request version ('ÚÚ\x13\x01\x13\x02\x13\x03À+À/À,À0Ì©Ì¨À\x13À\x14\x00\x9c\x00\x9d\x00/\x005\x01\x00\x01\x93')
+ERROR 2023-04-24 22:04:30,215 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2023-04-24 22:04:33,617 code 400, message Bad request version ('[\xad(*\x1aÕP\x98ÿøÇyêþåðÒ±î\x05~5Î^fp\x90u\x00')
+ERROR 2023-04-24 22:04:33,617 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2023-04-24 22:04:34,024 code 400, message Bad request version ('**\x13\x01\x13\x02\x13\x03À+À/À,À0Ì©Ì¨À\x13À\x14\x00\x9c\x00\x9d\x00/\x005\x01\x00\x01\x93')
+ERROR 2023-04-24 22:04:34,025 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2023-04-24 22:05:04,823 code 400, message Bad request version ('\x00\x02\x01\x00\x00')
+ERROR 2023-04-24 22:05:04,823 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2023-04-24 22:05:05,232 code 400, message Bad request version ('\x02h2\x08http/1.1\x00\x17\x00\x00\x00#\x00\x00\x00')
+ERROR 2023-04-24 22:05:05,232 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2023-04-24 22:06:07,304 Watching for file changes with StatReloader
+INFO 2023-04-24 22:06:10,878 code 400, message Bad request version ('92\x9dûÙ\x88Â')
+ERROR 2023-04-24 22:06:10,878 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2023-04-24 22:06:11,316 code 400, message Bad request version ('\x9bsÚ9ábJM¶\xadþÙIHÄ\x17¢')
+ERROR 2023-04-24 22:06:11,316 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2023-04-24 22:07:59,623 code 400, message Bad request version ('\x1a\x1a\x13\x01\x13\x02\x13\x03À+À/À,À0Ì©Ì¨À\x13À\x14\x00\x9c\x00\x9d\x00/\x005\x01\x00\x01\x93')
+ERROR 2023-04-24 22:07:59,624 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2023-04-24 22:07:59,671 code 400, message Bad request version ('schoobees.comDi\x00\x05\x00\x03\x02h2\x00#\x00\x00\x00+\x00\x07\x06**\x03\x04\x03\x03\x00')
+ERROR 2023-04-24 22:07:59,671 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2023-04-24 22:08:00,072 code 400, message Bad request version ('õ`\x10\x89Æ³QPÊBv')
+ERROR 2023-04-24 22:08:00,072 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2023-04-24 22:08:00,239 code 400, message Bad request version ('\x00\x02\x01\x00\x00#\x00\x00\x00')
+ERROR 2023-04-24 22:08:00,239 You're accessing the development server over HTTPS, but it only supports HTTP.
