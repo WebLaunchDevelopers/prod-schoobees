@@ -26,7 +26,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['schoobees.com','www.schoobees.com','16.16.142.59','localhost','.schoobees.com']
+ALLOWED_HOSTS = ['schoobees.com','www.schoobees.com','16.170.216.42','localhost','.schoobees.com']
 
 
 # Application definition
