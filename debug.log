@@ -101,3 +101,4 @@ INFO 2023-04-24 22:08:00,072 code 400, message Bad request version ('õ`\x10\x89
 ERROR 2023-04-24 22:08:00,072 You're accessing the development server over HTTPS, but it only supports HTTP.
 INFO 2023-04-24 22:08:00,239 code 400, message Bad request version ('\x00\x02\x01\x00\x00#\x00\x00\x00')
 ERROR 2023-04-24 22:08:00,239 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2023-04-27 19:08:58,428 Watching for file changes with StatReloader
