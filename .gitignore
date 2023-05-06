@@ -32,3 +32,6 @@ __pycache__/
 *.pg_restore
 
 staticfiles/
+
+debug.log
+debug.log*
