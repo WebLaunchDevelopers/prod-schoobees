@@ -1,0 +1,30 @@
+WARNING 2023-05-01 03:29:21,523 Forbidden (Referer checking failed - no Referer.): /
+WARNING 2023-05-02 00:32:22,650 Forbidden (Referer checking failed - no Referer.): /
+WARNING 2023-05-02 01:57:35,095 Forbidden (Referer checking failed - no Referer.): /
+WARNING 2023-05-02 12:37:17,032 Forbidden (Referer checking failed - no Referer.): /
+WARNING 2023-05-02 17:38:12,064 Forbidden (Referer checking failed - no Referer.): /
+WARNING 2023-05-03 00:00:02,471 Forbidden (Referer checking failed - no Referer.): /
+WARNING 2023-05-03 01:46:21,465 Forbidden (Referer checking failed - no Referer.): /
+WARNING 2023-05-03 05:55:12,292 Forbidden (Referer checking failed - no Referer.): /
+ERROR 2023-05-03 06:42:36,354 Invalid HTTP_HOST header: '139.162.78.137'. You may need to add '139.162.78.137' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/ubuntu/schoobeesenv/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/ubuntu/schoobeesenv/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/ubuntu/schoobeesenv/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/ubuntu/schoobeesenv/lib/python3.10/site-packages/django/http/request.py", line 167, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '139.162.78.137'. You may need to add '139.162.78.137' to ALLOWED_HOSTS.
+WARNING 2023-05-03 06:42:36,354 Bad Request: /
+WARNING 2023-05-03 13:36:34,194 Forbidden (Referer checking failed - no Referer.): /
+WARNING 2023-05-03 13:58:20,076 Forbidden (Referer checking failed - no Referer.): /
+WARNING 2023-05-04 11:53:21,888 Forbidden (Referer checking failed - no Referer.): /
+WARNING 2023-05-04 12:27:22,685 Forbidden (Referer checking failed - no Referer.): /
+WARNING 2023-05-05 08:57:21,547 Forbidden (Referer checking failed - no Referer.): /
+WARNING 2023-05-05 11:07:05,314 Forbidden (Referer checking failed - no Referer.): /
+WARNING 2023-05-05 11:20:48,203 Forbidden (Referer checking failed - no Referer.): /
+WARNING 2023-05-05 14:03:12,429 Forbidden (Referer checking failed - no Referer.): /
+WARNING 2023-05-05 15:33:48,026 Forbidden (Referer checking failed - no Referer.): /
+WARNING 2023-05-05 19:28:46,457 Forbidden (Referer checking failed - no Referer.): /
