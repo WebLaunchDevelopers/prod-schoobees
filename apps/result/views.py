@@ -8,6 +8,8 @@ from apps.students.models import Student
 
 from .forms import CreateResults, EditResults
 from .models import Result
+from apps.corecode.models import Subject
+
 from apps.corecode.models import StudentClass
 
 from plotly.offline import plot
@@ -95,7 +97,7 @@ def edit_results(request):
 
 @login_required
 def get_results(request):
-    print(request.user)#asdf
+    #print(request.user)#asdf
     results = Result.objects.filter(
         user=request.user
     )
@@ -104,51 +106,51 @@ def get_results(request):
     #print(classes)
     resultss=dict()
     for clas in classes:
+        subjects,students=list(),list()
+        unique_subjects = Result.objects.filter(user=request.user,current_class=clas).values("subject").distinct()
+        unique_students = Result.objects.filter(user=request.user,current_class=clas).values("student").distinct()
         result = Result.objects.filter(user=request.user,current_class=clas)
+        
         if len(result) != 0:
             class_data=dict()
             class_data["student"]=result
+
+            for subject in unique_subjects:
+                subject_obj = Subject.objects.get(pk=subject['subject'])
+                subjects.append(subject_obj.name)
+            #print("Subjects",subjects)
+            #print("Students",unique_students)
+            mig=list()
+            for student in unique_students:
+                print("test----------->",student)
+                student_obj = Student.objects.get(pk=student['student'])
+                print(student_obj)
+                di=dict()
+                
+                test=Result.objects.filter(student=student_obj).values_list("test_score", flat=True)
+                exam=Result.objects.filter(student=student_obj).values_list("exam_score", flat=True)
+                total = [sum(x) for x in zip(test, exam)]
+                total.append(sum(total))
+                #print(total)
+                if student_obj.registration_number not in mig:
+                    di[student_obj.registration_number]=total
+                    mig.append(student_obj.registration_number)
+                    #print(di)
+                    students.append(di)
+            #students=list(set(students))
+            #print(di)
+            #print("mig:",mig)
+            #print(students)           
+            subjects.append("Total")
+            class_data["subject"]=subjects
+            class_data["students"]=students
             resultss[clas]=class_data
+            #print("Results---------------->",resultss)
+
+
+            
         else:
-            print("----->",classes,clas)
             classes = classes.exclude(pk=clas.pk)
-            #classes.exclude(StudentClass=clas)
-    #print(resultss) #{<StudentClass: 8th>: {'student': <QuerySet [<Result: 1234 1234 (1234) 2022-2023 1st Term English>, <Result: 1234 1234 (1234) 2022-2023 1st Term Telugu>, <Result: 2345 23452345 (2345) 2022-2023 1st Term Telugu>, <Result: 3456 3456 (3456) 2022-2023 1st Term Telugu>]>}}
-    
-    
-    for clas in classes:  
-        bulk = {}
-        data,label=list(),list()
-        for result in resultss[clas]["student"]:
-            test_total = 0
-            exam_total = 0
-            subjects = []
-            for subject in results:
-                if subject.student == result.student:
-                    subjects.append(subject)
-                    test_total += subject.test_score
-                    exam_total += subject.exam_score
-                    
-            data.append(test_total+exam_total)
-            label.append(result.student.first_name+" "+result.student.last_name)
-
-            bulk[result.student.registration_number] = {
-                "student": result.student,
-                "subjects": subjects,
-                "test_total": test_total,
-                "exam_total": exam_total,
-                "total_total": test_total + exam_total,
-            }
-
-        resultss[clas]["data"]=data[1:]
-        resultss[clas]["label"]=label[1:]
-        df=pd.DataFrame(data[1:],label[1:])
-
-        fig = px.bar(df)
-        chart=plot(fig,output_type="div")
-
-        resultss[clas]["results"]=bulk
-        resultss[clas]["chart"]=chart
 
     context = {"results": resultss}
-    return render(request, "result/all_results.html", context)
+    return render(request, "result/all_results2.html", context)
