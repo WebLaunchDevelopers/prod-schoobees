@@ -35,3 +35,6 @@ staticfiles/
 
 debug.log
 debug.log*
+
+static/admin
+static/rest_framework
