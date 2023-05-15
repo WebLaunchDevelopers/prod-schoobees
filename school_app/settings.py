@@ -24,9 +24,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['schoobees.com','www.schoobees.com','16.170.216.42','.schoobees.com']
+ALLOWED_HOSTS = ['schoobees.com','www.schoobees.com','16.170.216.42','.schoobees.com', '127.0.0.1']
 
 
 # Application definition
@@ -93,22 +93,22 @@ WSGI_APPLICATION = 'school_app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'schoobeesdb',
-	'USER': 'schoobeesdbuser',
-	'PASSWORD': 'avinashgummadi',
-	'HOST': 'localhost',
-	'PORT': '',
-    }
-}
 # DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'schoobeesdb',
+# 	'USER': 'schoobeesdbuser',
+# 	'PASSWORD': 'avinashgummadi',
+# 	'HOST': 'localhost',
+# 	'PORT': '',
 #     }
 # }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+    }
+}
 
 
 # Password validation
@@ -159,15 +159,15 @@ USE_TZ = True
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
-# STATIC_URL = 'static/'
+STATIC_URL = 'static/'
 
-# STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 
-# STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
-STATIC_URL = '/static/'
+# STATIC_URL = '/static/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
