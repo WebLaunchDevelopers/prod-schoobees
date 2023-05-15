@@ -12,7 +12,7 @@ class CustomUser(AbstractUser):
     def save(self, *args, **kwargs):
         # Generate a random 5-10 digit number for the register_id field
         while not self.register_id:
-            random_id = random.randint(10000, 2147483647)
+            random_id = random.randint(10000, 9999999999)
             if not CustomUser.objects.filter(register_id=random_id).exists():
                 self.register_id = random_id
 
