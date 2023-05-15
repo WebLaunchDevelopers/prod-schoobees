@@ -31,7 +31,7 @@ class RegisterView(View):
             profile = profile_form.save(commit=False)
             profile.user = user
             profile.save()
-            # send_activation_email(user, request)
+            send_activation_email(user, request)
             messages.success(request, 'Your account has been created. Please check your email to activate your account.')
             return redirect('login')
         else:
