@@ -3,22 +3,11 @@
 
 
 {% block title %}
-  Select the fields
+  Filter the data
 {% endblock title %}
 
 
 {% block content %}
-<style>
-
-  .form-check-input {
-    display: flex;
-    flex-direction: row;
-}
-.form-check-input div{
-    margin-inline: 2rem;
-}
-
-  </style>
 <div>
 
   <form method="POST">
@@ -41,16 +30,16 @@
 
 
 
-    <div class="form-group row subjects">
+    <div class="form-group row">
       {{ form.subjects.errors }}
       <label class="col-2" for="{{ form.subjects.id_for_label }}">{{ form.subjects.label_tag}}</label>
-      <div class="col">{{ form.subjects | add_class:"form-check-input" }}</div>
+      <div class="col">{{ form.subjects | add_class:"form-control" }}</div>
     </div>
 
     <input type="hidden" name="finish" value="True">
     <input type="hidden" name="students" value="{{ students }}">
 
-    <input type="submit" class="btn btn-success" value="Create">
+    <input type="submit" class="btn btn-success" value="Submit">
   </form>
 
 {% endblock content %}

@@ -14,6 +14,9 @@ from .models import Invoice, InvoiceItem, Receipt
 class InvoiceListView(LoginRequiredMixin, ListView):
     model = Invoice
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(user=self.request.user)
 
 class InvoiceCreateView(LoginRequiredMixin, CreateView):
     model = Invoice
@@ -89,7 +92,7 @@ class InvoiceDeleteView(LoginRequiredMixin, DeleteView):
 
 class ReceiptCreateView(LoginRequiredMixin, CreateView):
     model = Receipt
-    fields = ["amount_paid", "date_paid", "comment"]
+    fields = ["amount_paid", "date_paid", "payment_method", "comment"]
     success_url = reverse_lazy("invoice-list")
 
     def form_valid(self, form):

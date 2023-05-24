@@ -11,13 +11,16 @@ from django.shortcuts import render
 
 from apps.finance.models import Invoice
 
-from .models import Student, StudentBulkUpload
+from .models import Student, StudentBulkUpload, Feedback
+
 
 from apps.result.models import Result
 from apps.corecode.models import StudentClass
 from plotly.offline import plot
 import plotly.express as px 
 import pandas as pd
+from django.core.exceptions import ValidationError
+from django.contrib import messages
 
 class StudentListView(LoginRequiredMixin, ListView):
     model = Student
@@ -40,11 +43,9 @@ class StudentDetailView(LoginRequiredMixin, DetailView):
         subjects, subject, marks = dict(), list(), list()
         score, total = 0, 0
         for result in results:
-            test = result.test_score
             exam = result.exam_score
-            score = result.test_score + result.exam_score
-            total += score
-            subjects[str(result.subject)] = {"test": test, "exam": exam, "score": score}
+            total += exam
+            subjects[str(result.subject)] = {"exam": exam, "score": score}
             
             subject.append(str(result.subject))
             marks.append(score)
@@ -57,28 +58,26 @@ class StudentDetailView(LoginRequiredMixin, DetailView):
         context["result"] = subjects
         context["total"] = total
         context["chart"] = chart
-        #print("---------------->",context)
         return context
     
-
 class StudentCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Student
-    fields = ['current_status','registration_number', 'first_name', 'last_name', 'guardian_name', 'gender', 'date_of_birth', 'current_class', 'date_of_admission', 'parent_mobile_number', 'address', 'comments', 'passport']
-    success_message = "New student successfully added."
+    fields = ['current_status', 'registration_number', 'first_name', 'last_name', 'guardian_name', 'gender', 'date_of_birth', 'current_class', 'date_of_admission', 'parent_mobile_number', 'address', 'comments', 'passport']
+    success_url = reverse_lazy("student-list")  # Redirect URL after successful form submission
 
-    def get_form(self):
-        """add date picker in forms"""
-        form = super(StudentCreateView, self).get_form()
+    def get_form(self, form_class=None):
+        """Add date picker in forms"""
+        form = super().get_form(form_class)
         form.fields["date_of_birth"].widget = widgets.DateInput(attrs={"type": "date"})
+        form.fields["date_of_admission"].widget = widgets.DateInput(attrs={"type": "date"})
         form.fields["address"].widget = widgets.Textarea(attrs={"rows": 2})
         form.fields["comments"].widget = widgets.Textarea(attrs={"rows": 2})
+        form.fields["current_class"].queryset = StudentClass.objects.filter(user=self.request.user)  # Filter the queryset based on the logged-in user
         return form
-    
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        return super().form_valid(form)
 
-from django.http import Http404
+    def form_valid(self, form):
+        form.instance.user = self.request.user  # Assign the logged-in user to the student's user field
+        return super().form_valid(form)
 
 class StudentUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Student
@@ -110,11 +109,8 @@ class StudentUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         return obj
 
     def get(self, request, *args, **kwargs):
-        print("in get")
         self.object = self.get_object()
-        print("views.py: ")
         if self.object is None:
-            print("in None")
             return HttpResponse("No student found matching the query")
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
@@ -130,6 +126,40 @@ class StudentBulkUploadView(LoginRequiredMixin, SuccessMessageMixin, CreateView)
     fields = ["csv_file"]
     success_url = "/student/list"
     success_message = "Successfully uploaded students"
+    expected_fields = [
+                "registration_number",
+                "first_name",
+                "last_name",
+                "guardian_name"
+                "gender",
+                "parent_number",
+                "address",
+                "current_class",
+                "comments"
+                       ]
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        # Retrieving the uploaded file
+        csv_file = form.cleaned_data.get("csv_file")
+        try:
+            # Reading the CSV file
+            reader = csv.DictReader(csv_file)
+            # Checking if the CSV file contains all the expected fields
+            csv_fields = reader.fieldnames
+            if not all(field in csv_fields for field in self.expected_fields):
+                raise ValidationError("The uploaded CSV file is missing some fields.")
+            # Performing further processing and saving
+
+        except csv.Error:
+            form.add_error(None, "Invalid CSV file format.")
+            return self.form_invalid(form)
+
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Invalid CSV file")
+        return super().form_invalid(form)
 
 
 class DownloadCSVViewdownloadcsv(LoginRequiredMixin, View):
@@ -153,3 +183,13 @@ class DownloadCSVViewdownloadcsv(LoginRequiredMixin, View):
         )
 
         return response
+    
+class FeedbackListView(LoginRequiredMixin, ListView):
+    model = Feedback
+    template_name = 'students/student_feedbacks.html'
+    context_object_name = 'feedbacks'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(user=self.request.user)
+        return queryset

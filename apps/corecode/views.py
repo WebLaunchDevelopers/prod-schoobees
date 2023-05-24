@@ -14,10 +14,6 @@ from django.core.files.storage import FileSystemStorage
 import os
 from django.utils.html import strip_tags
 
-from apps.base.utils import send_activation_email
-
-# from django.views import View
-
 from .forms import (
     AcademicSessionForm,
     AcademicTermForm,
@@ -39,7 +35,7 @@ from .models import (
     StudentClass,
     Subject,
     Calendar,
-    Driver
+    Driver,
 )
 
 import json
@@ -80,7 +76,6 @@ class IndexView(LoginRequiredMixin, ListView):
         context.update({
             'event_list': json.dumps(event_list)
         })
-        print(context)
         return context
     
 class SiteConfigView(LoginRequiredMixin, View):
@@ -398,7 +393,7 @@ class CurrentSessionAndTermView(LoginRequiredMixin, View):
         return render(request, self.template_name, {"form": form})
 
     def post(self, request, *args, **kwargs):
-        form = self.form_Class(request.POST)
+        form = self.form_class(request.POST)
         if form.is_valid():
             session = form.cleaned_data["current_session"]
             term = form.cleaned_data["current_term"]
@@ -523,7 +518,6 @@ class DriversView(LoginRequiredMixin, SuccessMessageMixin, View):
             driver_form = DriverForm()
             messages.success(request, "Record Saved")
         else:
-            print(driver_form.errors)
             context = {
                 'driver_form': driver_form,
                 'drivers': drivers

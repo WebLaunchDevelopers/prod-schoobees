@@ -12,9 +12,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Staff,StaffBulkUpload
 
-class StaffListView(ListView):
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+
+class StaffListView(LoginRequiredMixin, ListView):
     model = Staff
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(user=self.request.user)
 
 class StaffDetailView(DetailView):
     model = Staff
@@ -95,9 +101,45 @@ class StaffBulkUploadView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     fields = ["csv_file"]
     success_url = "/staff/list"
     success_message = "Successfully uploaded staff"
-    
 
-class DownloadCSVViewdownloadcsv(LoginRequiredMixin, View):
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+
+        # Retrieving the uploaded file
+        csv_file = form.cleaned_data.get("csv_file")
+
+        try:
+            # Reading the CSV file
+            reader = csv.DictReader(csv_file)
+
+            # Checking if the CSV file contains all the expected fields
+            expected_fields = [
+                'current_status',
+                'first_name',
+                'last_name',
+                'gender',
+                'date_of_birth',
+                'email',
+                'mobile_number',
+                'address',
+                'comments'
+            ]
+            csv_fields = reader.fieldnames
+            if not all(field in csv_fields for field in expected_fields):
+                form.add_error(None, "The uploaded CSV file is missing some fields.")
+                return self.form_invalid(form)
+
+            # Performing further processing and saving
+
+        except csv.Error:
+            form.add_error(None, "Invalid CSV file format.")
+            return self.form_invalid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Invalid CSV file")
+        return super().form_invalid(form)
+
+class DownloadstaffCSVViewdownloadcsv(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         response = HttpResponse(content_type="text/csv")
         response["Content-Disposition"] = 'attachment; filename="staff_template.csv"'
@@ -105,13 +147,14 @@ class DownloadCSVViewdownloadcsv(LoginRequiredMixin, View):
         writer = csv.writer(response)
         writer.writerow(
             [
-                "first_name",
-                "last_name",
-                "guardian_name"
-                "gender",
-                "parent_number",
-                "address",
-                "current_class",
+                'current_status',
+                'first_name',
+                'last_name',
+                'gender',
+                'date_of_birth',
+                'email',
+                'mobile_number',
+                'address',
                 'comments'
             ]
         )
