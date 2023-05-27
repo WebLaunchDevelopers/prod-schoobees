@@ -26,8 +26,8 @@ class CreateResultView(LoginRequiredMixin, View):
             subject = form.cleaned_data["subjects"]
             exam = form.cleaned_data["exam"]
             results = []
-            for student in Student.objects.filter(current_class=class_name):
-                check = Result.objects.filter(current_class=class_name, subject=subject, student=student, exam=exam).first()
+            for student in Student.objects.filter(user=request.user, current_class=class_name):
+                check = Result.objects.filter(user=request.user, current_class=class_name, subject=subject, student=student, exam=exam).first()
                 if not check:
                     result = Result(
                         user=request.user,
@@ -53,7 +53,10 @@ class EditResultsView(LoginRequiredMixin, View):
         examid = request.GET.get("examid")
         results = Result.objects.filter(user=request.user, current_class=classid, subject=subjectid, exam=examid)
         formset = EditResults(queryset=results)
-        return render(request, "result/edit_results.html", {"formset": formset})
+        records = False
+        if results.exists():
+            records = True
+        return render(request, "result/edit_results.html", {"formset": formset, "records": records})
 
     def post(self, request):
         classid = request.GET.get("classid")
@@ -89,7 +92,18 @@ class GetResultsView(LoginRequiredMixin, View):
                 subjects.append(Subject.objects.get(pk=subject["subject"]))
 
             for student_id in unique_student_ids:
-                students.append(Student.objects.get(pk=student_id))
+                student = Student.objects.get(pk=student_id)
+                total_score = 0  # Initialize the total score for each student
+                count = 0
+
+                for subject in subjects:
+                    # Retrieve the result for the current student and subject
+                    result = Result.objects.filter(user=request.user, current_class=eachclass, student=student, subject=subject).first()
+                    if result:
+                        count += 1  # Increment the count of results retrieved
+                        total_score += result.exam_score  # Add the exam score to the total score
+                percent = (total_score/(count*100))*100
+                students.append({"student": student, "total_score": total_score, "percent": percent})
 
             if subjects or students:
                 has_records = True
@@ -97,10 +111,15 @@ class GetResultsView(LoginRequiredMixin, View):
 
         return render(request, "result/all_results.html", {"results": results, "resultss": resultss, "has_records": has_records})
 
+
 class ExamsListView(LoginRequiredMixin, ListView):
     model = Exam
     template_name = 'corecode/exams_list.html'
     context_object_name = 'exams'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(user=self.request.user)
 
 class ExamsCreateView(LoginRequiredMixin, CreateView):
     model = Exam
@@ -108,6 +127,11 @@ class ExamsCreateView(LoginRequiredMixin, CreateView):
     template_name = 'corecode/exams_form.html'
     success_url = reverse_lazy('exams_list')
     success_message = "Exams added successfully."
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()

@@ -53,8 +53,10 @@ class StudentBulkUpload(models.Model):
 
 class Feedback(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    is_seen = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-created_at']
