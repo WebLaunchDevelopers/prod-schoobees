@@ -8,7 +8,6 @@ from django.contrib.auth import get_user_model
 
 CustomUser = get_user_model()
 
-
 class Invoice(models.Model):
     user = models.ForeignKey(CustomUser, on_delete = models.CASCADE)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -19,8 +18,8 @@ class Invoice(models.Model):
     payment_due = models.DateField(default=timezone.now, null=True, blank=True)
     status = models.CharField(
         max_length=20,
-        choices=[("active", "Active"), ("closed", "Closed")],
-        default="active",
+        choices=[("unpaid", "Unpaid"), ("paid", "Paid")],
+        default="unpaid",
     )
 
     class Meta:

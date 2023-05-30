@@ -33,6 +33,8 @@ class RegisterView(View):
             profile.save()
             # send_activation_email(user, request)
             messages.success(request, 'Your account has been created. Please wait for the approval of your account.')
+            if request.user.is_authenticated:
+                logout(request)
             return redirect('login')
         else:
             messages.error(request, 'Invalid details.')
@@ -54,11 +56,21 @@ class ActivateView(View):
 
 class LoginView(View):
     def get(self, request):
+        if request.user.is_authenticated:
+            if request.user.is_superuser:
+                  return redirect('/admin/login')
+            return redirect('home')
+
         form = LoginForm()
         next = request.GET.get('next')
         return render(request, 'registration/login.html', {'form': form, 'next': next})
 
     def post(self, request):
+        if request.user.is_authenticated:
+            if request.user.is_superuser:
+                  return redirect('/admin/login')
+            return redirect('home')
+        
         form = LoginForm(data=request.POST)
         next = request.POST.get('next')
         if form.is_valid():

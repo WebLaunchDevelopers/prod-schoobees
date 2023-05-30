@@ -1,7 +1,8 @@
 from django.db import models
 from datetime import datetime
 from django.contrib.auth import get_user_model
-import uuid
+import random
+import string
 
 CustomUser = get_user_model()
 # Create your models here.
@@ -31,7 +32,7 @@ class AcademicSession(models.Model):
             return f"{current_year}-{current_year + 1}"
     default_name = get_academic_year()
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    name = models.CharField(max_length=200, unique=True, default=default_name)
+    name = models.CharField(max_length=200, default=default_name)
     current = models.BooleanField(default=True)
 
     class Meta:
@@ -45,7 +46,7 @@ class AcademicTerm(models.Model):
     """Academic Term"""
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    name = models.CharField(max_length=20, unique=True, default="1st Term")
+    name = models.CharField(max_length=20, default="1st Term")
     current = models.BooleanField(default=True)
 
     class Meta:
@@ -94,7 +95,8 @@ class Calendar(models.Model):
 
 class Driver(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.CharField(max_length=9, unique=True, primary_key=True, editable=False)
+    is_driveradmin = models.BooleanField(default=False)
     name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=20)
     alternate_number = models.CharField(max_length=20)
@@ -108,13 +110,32 @@ class Driver(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        # Generate a random 5-10 digit number for the id field
+        while not self.id:
+            random_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=9))
+            if not Driver.objects.filter(id=random_id).exists():
+                self.id = random_id
+
+        super().save(*args, **kwargs)
+
 class Route(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    assigned_driver = models.CharField(max_length=20, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+class RouteNodes(models.Model):
+    route = models.ForeignKey(Route, on_delete=models.CASCADE)
     area = models.CharField(max_length=100)
     latitude = models.CharField(max_length=10)
     longitude = models.CharField(max_length=10)
-    prev = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='prev_routes')
-    nxt = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='next_routes')
+    is_start_stop = models.BooleanField(default=False)
+    is_destination_stop = models.BooleanField(default=False)
 
     def __str__(self):
         return self.area

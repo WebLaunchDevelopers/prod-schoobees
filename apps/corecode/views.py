@@ -46,6 +46,11 @@ from apps.corecode.models import Driver
 class IndexView(LoginRequiredMixin, ListView):
     template_name = "index.html"
     model = StudentClass
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_superuser:
+            return redirect('/admin/login')
+        return super().dispatch(request, *args, **kwargs)
     
     def get_queryset(self):
         # Retrieve all objects associated with the logged-in user
@@ -84,6 +89,8 @@ class SiteConfigView(LoginRequiredMixin, View):
     def get(self, request):
         if request.user.is_faculty:
             return redirect('faculty-profile')
+        elif request.user.is_superuser:
+            return redirect('/admin/login')
         user = request.user
         custom_user_form = CustomUserForm(instance=user)
         user_profile_form = UserProfileForm(instance=user.userprofile)
@@ -180,10 +187,15 @@ class SessionCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context["title"] = "Add new session"
         return context
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+    
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
-
 
 class SessionUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = AcademicSession
@@ -220,7 +232,6 @@ class SessionDeleteView(LoginRequiredMixin, DeleteView):
         messages.success(self.request, self.success_message.format(obj.name))
         return super(SessionDeleteView, self).delete(request, *args, **kwargs)
 
-
 class TermListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
     model = AcademicTerm
     template_name = "corecode/term_list.html"
@@ -241,9 +252,15 @@ class TermCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     template_name = "corecode/mgt_form.html"
     success_url = reverse_lazy("terms")
     success_message = "New term successfully added"
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def form_valid(self, form):
-            form.instance.user = self.request.user
-            return super().form_valid(form)
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
 class TermUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = AcademicTerm
@@ -264,7 +281,6 @@ class TermUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
                 messages.warning(self.request, "You must set a term to current.")
                 return redirect("term")
         return super().form_valid(form)
-
 
 class TermDeleteView(LoginRequiredMixin, DeleteView):
     model = AcademicTerm
@@ -323,7 +339,6 @@ class ClassUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
             form.add_error('name', 'Class with this name already exists')
             return self.form_invalid(form)
 
-
 class ClassDeleteView(LoginRequiredMixin, DeleteView):
     model = StudentClass
     success_url = reverse_lazy("classes")
@@ -338,6 +353,10 @@ class ClassDeleteView(LoginRequiredMixin, DeleteView):
 class SubjectListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
     model = Subject
     template_name = "corecode/subject_list.html"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(user=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -367,7 +386,9 @@ class SubjectUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     success_url = reverse_lazy("subjects")
     success_message = "Subject successfully updated."
     template_name = "corecode/mgt_form.html"
-
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
 class SubjectDeleteView(LoginRequiredMixin, DeleteView):
     model = Subject
@@ -380,24 +401,18 @@ class SubjectDeleteView(LoginRequiredMixin, DeleteView):
         messages.success(self.request, self.success_message.format(obj.name))
         return super(SubjectDeleteView, self).delete(request, *args, **kwargs)
 
+
 class CurrentSessionAndTermView(LoginRequiredMixin, View):
-    """Current SEssion and Term"""
+    """Current Session and Term"""
 
     form_class = CurrentSessionForm
     template_name = "corecode/current_session.html"
+    success_message = "Current Session/term updated successfully."
 
     def get(self, request, *args, **kwargs):
-        current_session = None
-        current_term = None
-        if request.user.is_authenticated:
-            try:
-                current_session = AcademicSession.objects.get(user=request.user, current=True)
-            except AcademicSession.DoesNotExist:
-                pass
-            try:
-                current_term = AcademicTerm.objects.get(user=request.user, current=True)
-            except AcademicTerm.DoesNotExist:
-                pass
+        current_session = AcademicSession.objects.filter(user=request.user, current=True).first()
+        current_term = AcademicTerm.objects.filter(user=request.user, current=True).first()
+
         form = self.form_class(
             user=request.user,
             initial={
@@ -407,29 +422,25 @@ class CurrentSessionAndTermView(LoginRequiredMixin, View):
         )
         return render(request, self.template_name, {"form": form})
 
+
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
             session = form.cleaned_data["current_session"]
             term = form.cleaned_data["current_term"]
-            AcademicSession.objects.filter(name=session).update(current=True)
-            AcademicSession.objects.exclude(name=session).update(current=False)
-            AcademicTerm.objects.filter(name=term).update(current=True)
+
+            # Update current session
+            AcademicSession.objects.filter(user=request.user, current=True).update(current=False)
+            AcademicSession.objects.filter(user=request.user, name=session).update(current=True)
+
+            # Update current term
+            AcademicTerm.objects.filter(user=request.user, current=True).update(current=False)
+            AcademicTerm.objects.filter(user=request.user, name=term).update(current=True)
+
 
         return render(request, self.template_name, {"form": form})
 
-class SubjectListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
-    model = Subject
-    template_name = "corecode/subject_list.html"
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset.filter(user=self.request.user)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form"] = SubjectForm()
-        return context
 
 class CalendarCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Calendar
@@ -558,25 +569,6 @@ class DriversView(LoginRequiredMixin, SuccessMessageMixin, View):
 class DriverDetailView(LoginRequiredMixin, DetailView):
     model = Driver
     template_name = 'corecode/driver_details.html'
-    qrcodeimg = None  # initialize img variable
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        driver = self.get_object()
-        data = {'driver_auth': driver.id, 'register_id': self.request.user.register_id}
-        qr = qrcode.QRCode(version=1, box_size=10, border=5)
-        qr.add_data(str(data))
-        qr.make(fit=True)
-        qrcodeimg = qr.make_image(fill='black', back_color='white')
-        # Save the image to a temporary file
-        tmp_filename = os.path.join(settings.MEDIA_ROOT, 'qrcode.png')
-        with open(tmp_filename, 'wb') as f:
-            qrcodeimg.save(f)
-        # Get the URL of the temporary file
-        fs = FileSystemStorage()
-        img_url = fs.url(tmp_filename)
-        context['img_url'] = img_url
-        return context
 
 class DriverDeleteView(LoginRequiredMixin, DeleteView):
     model = Driver

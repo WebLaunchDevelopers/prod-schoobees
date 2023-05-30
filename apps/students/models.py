@@ -3,7 +3,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 
-from apps.corecode.models import StudentClass
+from apps.corecode.models import StudentClass, AcademicSession, AcademicTerm
 from django.contrib.auth import get_user_model
 
 CustomUser = get_user_model()
@@ -36,6 +36,8 @@ class Student(models.Model):
     address = models.TextField(blank=True)
     comments = models.TextField(blank=True)
     passport = models.ImageField(blank=True, upload_to="students/passports/")
+    session = models.ForeignKey(AcademicSession, on_delete=models.CASCADE)
+    term = models.ForeignKey(AcademicTerm, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ["registration_number", "first_name", "last_name"]
@@ -51,6 +53,17 @@ class StudentBulkUpload(models.Model):
     date_uploaded = models.DateTimeField(auto_now=True)
     csv_file = models.FileField(upload_to="students/bulkupload/")
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        current_session = AcademicTerm.objects.filter(user=self.request.user, start_date__lte=timezone.now(),
+                                                      end_date__gte=timezone.now()).first()
+        current_term = AcademicTerm.objects.filter(user=self.request.user, start_date__lte=timezone.now(),
+                                                   end_date__gte=timezone.now()).order_by('-start_date').first()
+
+        return queryset.filter(user=self.request.user, date_uploaded__gte=current_term.start_date,
+                               date_uploaded__lte=current_term.end_date)
+
 class Feedback(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -61,3 +74,20 @@ class Feedback(models.Model):
     class Meta:
         ordering = ['-created_at']
 
+class Notification(models.Model):
+    RECIPIENT_CHOICES = [
+        ('student', 'Student'),
+        ('class', 'Class'),
+        ('school', 'School'),
+    ]
+
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='sent_notifications')
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    recipients = models.CharField(max_length=10, choices=RECIPIENT_CHOICES)
+    class_for = models.ForeignKey(StudentClass, on_delete=models.CASCADE, null=True, blank=True)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return self.title
