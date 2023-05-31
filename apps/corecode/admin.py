@@ -8,7 +8,7 @@ from .models import (
     Calendar,
     Driver,
     Route,
-    RouteNodes
+    RouteNode
 )
 
 class SiteConfigAdmin(admin.ModelAdmin):
@@ -45,14 +45,14 @@ class RouteAdmin(admin.ModelAdmin):
     list_filter = ('user',)
     search_fields = ('name', 'user__username')
 
-class RouteNodesAdmin(admin.ModelAdmin):
+class RouteNodeAdmin(admin.ModelAdmin):
     list_display = ('area', 'route', 'is_start_stop', 'is_destination_stop')
     list_filter = ('route',)
     search_fields = ('area', 'route__name')
 
 admin.site.register(Driver, DriverAdmin)
 admin.site.register(Route, RouteAdmin)
-admin.site.register(RouteNodes, RouteNodesAdmin)
+admin.site.register(RouteNode, RouteNodeAdmin)
 admin.site.register(SiteConfig, SiteConfigAdmin)
 admin.site.register(AcademicSession, AcademicSessionAdmin)
 admin.site.register(AcademicTerm, AcademicTermAdmin)
