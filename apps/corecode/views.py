@@ -12,8 +12,9 @@ import qrcode
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 import os
+from django.urls import reverse
 from django.utils.html import strip_tags
-
+from apps.students.models import Feedback
 from .forms import (
     AcademicSessionForm,
     AcademicTermForm,
@@ -43,6 +44,15 @@ from apps.staffs.models import Staff
 from apps.students.models import Student
 from apps.corecode.models import Driver
 
+class BaseView(TemplateView):
+    template_name = 'base.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        feedback_count = Feedback.objects.filter(user=self.request.user).count()
+        context['feedback_count'] = feedback_count
+        return context
+
 class IndexView(LoginRequiredMixin, ListView):
     template_name = "index.html"
     model = StudentClass
@@ -59,9 +69,9 @@ class IndexView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["form"] = StudentClassForm()
-        student_count = Student.objects.all().count()        
-        staff_count = Staff.objects.all().count()    
-        non_staff_count = Driver.objects.all().count()
+        student_count = Student.objects.filter(user=self.request.user).count()
+        staff_count = Staff.objects.filter(user=self.request.user).count()
+        non_staff_count = Driver.objects.filter(user=self.request.user).count()
         # Check if the user has any objects associated with them
         if not context["object_list"]:
             context["bool"] = True
@@ -73,7 +83,7 @@ class IndexView(LoginRequiredMixin, ListView):
         
         from datetime import datetime
         today = datetime.today()
-        staffBdays=Staff.objects.filter(date_of_birth__month=today.month, date_of_birth__day=today.day)
+        staffBdays=Staff.objects.filter(user=self.request.user, date_of_birth__month=today.month, date_of_birth__day=today.day)
         context["staffBdays"]=staffBdays
         
         events = Calendar.objects.filter(user=self.request.user)
@@ -117,7 +127,7 @@ class SiteConfigView(LoginRequiredMixin, View):
         else:
             messages.error(request, 'There was an error in the form. Please correct it and try again.')
             return render(request, 'corecode/siteconfig.html', {'custom_user_form': custom_user_form, 'user_profile_form': user_profile_form})
-  
+
 class FacultyProfileView(LoginRequiredMixin, View):
     """Profile View"""
 
@@ -137,27 +147,44 @@ class FacultyProfileView(LoginRequiredMixin, View):
 
     def post(self, request):
         if not request.user.is_faculty:
-           return redirect('configs')
+            return redirect('configs')
         user = request.user
         try:
             staff = Staff.objects.get(email=request.user.username)
         except Staff.DoesNotExist:
             messages.error(request, 'Unable to fetch details. Please try again.')
             return redirect('home')
+
         custom_user_form = CustomUserForm(request.POST, instance=user)
         staff_profile_form = StaffProfileForm(request.POST, request.FILES, instance=staff)
+
         if custom_user_form.is_valid() and staff_profile_form.is_valid():
             custom_user_form.save()
-            staff_profile_form.save()
+
+            # Update the staff object with the form data
+            staff.first_name = staff_profile_form.cleaned_data['first_name']
+            staff.last_name = staff_profile_form.cleaned_data['last_name']
+            staff.gender = staff_profile_form.cleaned_data['gender']
+            staff.date_of_birth = staff_profile_form.cleaned_data['date_of_birth']
+            staff.mobile_number = staff_profile_form.cleaned_data['mobile_number']
+            staff.address = staff_profile_form.cleaned_data['address']
+
+            # Check if a new passport image is provided
+            passport_image = request.FILES.get('passport')
+            if passport_image:
+                # Validate the image file (optional)
+                if passport_image.content_type not in ['image/jpeg', 'image/png']:
+                    messages.error(request, 'Please upload a valid JPEG or PNG image.')
+                    return redirect('faculty-profile')
+
+                # Save the image file to the 'staff/passports/' directory
+                staff.passport = passport_image
+
+            # Save the staff object
+            staff.save()
+
             messages.success(request, 'Configurations successfully updated.')
-            return redirect('faculty-profile')
-        elif custom_user_form.errors:
-            email_error = strip_tags(custom_user_form.errors.get('email', ''))
-            if email_error == 'Email already exists':
-                messages.error(request, email_error)
-            else:
-                messages.error(request, 'There was an error in the form. Please correct it and try again.')
-            return redirect('faculty-profile')
+            return redirect(reverse('faculty-profile'))
         else:
             messages.error(request, 'There was an error in the form. Please correct it and try again.')
             return render(request, 'corecode/facultyprofile.html', {'custom_user_form': custom_user_form, 'staff_profile_form': staff_profile_form})
@@ -440,14 +467,17 @@ class CurrentSessionAndTermView(LoginRequiredMixin, View):
 
         return render(request, self.template_name, {"form": form})
 
-
-
 class CalendarCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Calendar
     template_name = "corecode/mgtspecial_form.html"
     success_url = reverse_lazy("calendar-list")
     success_message = "New event/holiday successfully added."
     form_class = CalendarForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Create'
+        return context
 
     def form_valid(self, form):
         obj = form.save(commit=False)
@@ -461,6 +491,11 @@ class CalendarUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     success_url = reverse_lazy("calendar-list")
     success_message = "Event/holiday updated successfully."
     form_class = CalendarForm
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Update'
+        return context
 
     def form_valid(self, form):
         obj = form.save(commit=False)

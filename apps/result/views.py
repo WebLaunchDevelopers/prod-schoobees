@@ -83,7 +83,6 @@ class EditResultsView(LoginRequiredMixin, View):
             redirect_url += f"?classid={classid}&subjectid={subjectid}&examid={examid}"
             return redirect(redirect_url)
 
-
 class GetResultsView(LoginRequiredMixin, View):
     def get(self, request):
         current_session = AcademicSession.objects.filter(user=self.request.user, current=True).first()
@@ -119,7 +118,7 @@ class GetResultsView(LoginRequiredMixin, View):
                     if result:
                         count += 1
                         total_score += result.exam_score
-                percent = (total_score / (count * 100)) * 100
+                percent = round(((total_score / (count * 100)) * 100), 1)
                 students.append({"student": student, "total_score": total_score, "percent": percent})
 
             if subjects or students:

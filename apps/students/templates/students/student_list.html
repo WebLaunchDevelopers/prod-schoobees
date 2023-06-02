@@ -10,6 +10,9 @@
 {% endblock breadcrumb %}
 
 {% block content %}
+  <div>
+    <p style="color: #999999;text-align:right;">Find what you're looking for</p>
+  </div>
   <div class="table-responsive">
     <table id="dtDynamicVerticalScrollExample" class="table table-striped table-bordered table-sm" cellspacing="0"
     width="100%">
@@ -31,7 +34,7 @@
           <tr class='clickable-row' data-href="{% url 'student-detail' student.pk %}">
             <td>{{ forloop.counter}}</td>
             <td>{{ student.registration_number}}</td>
-            <td>{{ student.last_name}} {{student.first_name }}</td>
+            <td>{{student.first_name }} {{ student.last_name}}</td>
             <td>{{ student.guardian_name }}</td>
             <td>{{ student.current_class}}</td>
             <td>{{ student.get_gender_display}}</td>

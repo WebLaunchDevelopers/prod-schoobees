@@ -8,9 +8,9 @@ from django.urls import reverse_lazy
 from django.views.generic import DetailView, ListView, View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.shortcuts import render, redirect
-
+from django.utils.safestring import mark_safe
 from apps.finance.models import Invoice
-
+from django.db.models import Count
 from .models import Student, StudentBulkUpload, Feedback, Notification, AcademicSession,AcademicTerm
 
 from apps.result.models import Result
@@ -24,8 +24,7 @@ from django.contrib import messages
 from django import forms
 
 from django.views.generic import FormView
-
-
+from io import StringIO
 
 class StudentListView(LoginRequiredMixin, ListView):
     model = Student
@@ -89,16 +88,27 @@ class StudentCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         form.fields["date_of_admission"].widget = widgets.DateInput(attrs={"type": "date"})
         form.fields["address"].widget = widgets.Textarea(attrs={"rows": 2})
         form.fields["comments"].widget = widgets.Textarea(attrs={"rows": 2})
+        # Setting the queryset for the current_class field
         form.fields["current_class"].queryset = StudentClass.objects.filter(user=self.request.user)
+
+        # Adding a link to create a class in the help text
+        form.fields["current_class"].help_text = mark_safe(
+            '<a href="{}">Click here to add class</a>'.format(reverse_lazy('class-create')))
+        form.fields["current_class"].empty_label = "Select One Class"
         return form
 
     def form_valid(self, form):
-        form.instance.user = self.request.user  # Assigning the logged-in user to the student's user field
+        form.instance.user = self.request.user  # Assign the logged-in user to the student's user field
         current_session = AcademicSession.objects.filter(user=self.request.user, current=True).first()
         current_term = AcademicTerm.objects.filter(user=self.request.user, current=True).first()
 
-        form.instance.session = current_session  # Assigning the current session to the student's session field
-        form.instance.term = current_term  # Assigning the current term to the student's term field
+        if current_session is None or current_term is None:
+            messages.error(self.request,
+                           "Sessions or terms are empty. Please create sessions and terms before creating a student.")
+            return self.form_invalid(form)
+
+        form.instance.session = current_session  # Assign the current session to the student's session field
+        form.instance.term = current_term  # Assign the current term to the student's term field
 
         return super().form_valid(form)
 
@@ -143,7 +153,6 @@ class StudentDeleteView(LoginRequiredMixin, DeleteView):
     model = Student
     success_url = reverse_lazy("student-list")
 
-
 class StudentBulkUploadView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = StudentBulkUpload
     template_name = "students/students_upload.html"
@@ -151,15 +160,15 @@ class StudentBulkUploadView(LoginRequiredMixin, SuccessMessageMixin, CreateView)
     success_url = "/student/list"
     success_message = "Successfully uploaded students"
     expected_fields = [
-                "registration_number",
-                "first_name",
-                "last_name",
-                "guardian_name"
-                "gender",
-                "parent_number",
-                "address",
-                "current_class",
-                "comments"
+        "registration_number",
+        "first_name",
+        "last_name",
+        "guardian_name",
+        "gender",
+        "parent_mobile_number",
+        "address",
+        "current_class",
+        "comments"
     ]
 
     def form_valid(self, form):
@@ -168,13 +177,13 @@ class StudentBulkUploadView(LoginRequiredMixin, SuccessMessageMixin, CreateView)
         csv_file = form.cleaned_data.get("csv_file")
         try:
             # Reading the CSV file
-            reader = csv.DictReader(csv_file)
+            opened = StringIO(csv_file.read().decode())
+            reader = csv.DictReader(opened, delimiter=",")
             # Checking if the CSV file contains all the expected fields
             csv_fields = reader.fieldnames
             if not all(field in csv_fields for field in self.expected_fields):
                 raise ValidationError("The uploaded CSV file is missing some fields.")
             # Performing further processing and saving
-
         except csv.Error:
             form.add_error(None, "Invalid CSV file format.")
             return self.form_invalid(form)
@@ -182,9 +191,12 @@ class StudentBulkUploadView(LoginRequiredMixin, SuccessMessageMixin, CreateView)
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        messages.error(self.request, "Invalid CSV file")
-        return super().form_invalid(form)
+        if form.errors.get("__all__") == ["Invalid CSV file format."]:
+            messages.error(self.request, "Invalid CSV file format.")
+        else:
+            messages.error(self.request, "Something went wrong. Please try again")
 
+        return super().form_invalid(form)
 
 class DownloadCSVViewdownloadcsv(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
@@ -199,10 +211,10 @@ class DownloadCSVViewdownloadcsv(LoginRequiredMixin, View):
                 "last_name",
                 "guardian_name",
                 "gender",
-                "parent_number",
+                "parent_mobile_number",
                 "address",
                 "current_class",
-                'comments'
+                "comments"
             ]
         )
 

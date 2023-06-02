@@ -24,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False # For 404 page keep it in False
+DEBUG = True # For 404 page keep it in False
 
 ALLOWED_HOSTS = ['schoobees.com','www.schoobees.com','16.170.216.42','.schoobees.com']
 
@@ -49,8 +49,10 @@ INSTALLED_APPS = [
     "apps.result",
     "apps.base",
     "apps.api",
-    "apps.attendence",
-    "crispy_forms"
+    "apps.attendance",
+    "crispy_forms",
+    'fontawesome_5',
+    "apps.time_table"
 ]
 
 AUTH_USER_MODEL = "base.CustomUser"
@@ -82,6 +84,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "apps.corecode.context_processors.site_defaults",
+                'apps.students.context_processors.feedback_count',
             ],
         },
     },

@@ -1,7 +1,9 @@
+{% load fontawesome_5 %}
+
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,6 +11,7 @@
 
   <title>{{ school_name | default:"SchooBees | MySchool" }}</title>
   <link rel="shortcut icon" href="{% static 'dist/img/logos/logo_y.png' %}" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha384-vMFd+I7DQv8KPBkdOgX+j7n+r3iVo1j4MYzbw1EzI0RTO1Dk1ETWE1Thvm3lLb7x" crossorigin="anonymous">
 
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
@@ -25,7 +28,17 @@
     href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700"
     rel="stylesheet">
 </head>
-
+<style>
+.badge {
+  position: absolute;
+  top: -1px;
+  right: 1px;
+  padding: 5px 10px;
+  border-radius: 50% !important;
+  background: red;
+  color: white;
+}
+</style>
 <body
   class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
   <div class="wrapper">
@@ -59,10 +72,21 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'feedback-list' %}" id="feedbackIcon" role="button" title="Feedbacks">
-            <i class="fas fa-envelope"></i>
+          <a class="nav-link" href="{% url 'timetable_list' %}" id="timetableIcon" role="button" title="timetable">
+            <i style="font-size:18px" class="fa">&#xf073;</i>
           </a>
         </li>
+
+       <li class="nav-item">
+        <a class="nav-link" href="{% url 'feedback-list' %}" id="feedbackIcon" role="button" title="Feedbacks">
+           <div class="feedback-count ">
+            <i class="fas fa-comment"></i>
+            {% if feedback_count %}
+                <span class="count badge">{{ feedback_count }}</span>
+            {% endif %}
+           </div>
+        </a>
+      </li>
         <li class="nav-item dropdown">
           <a class="nav-link" data-toggle="dropdown" href="#" title="Menu">
             <i class="far fa-user"></i>
@@ -155,7 +179,7 @@
 
             <li class="nav-header">Attendance</li>
             <li class="nav-item">
-              <a href="{% url 'update-attendence' %}" class="nav-link">
+              <a href="{% url 'update-attendance' %}" class="nav-link">
                 <i class="nav-icon fas fa-money-bill-alt"></i>
                 <p>
                   Update Attendance
@@ -163,7 +187,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a href="{% url 'view-attendence' %}" class="nav-link">
+              <a href="{% url 'view-attendance' %}" class="nav-link">
                 <i class="nav-icon fas fa-money-bill-alt"></i>
                 <p>
                   View Attendance
