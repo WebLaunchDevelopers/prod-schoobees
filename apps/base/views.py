@@ -104,7 +104,7 @@ class PasswordResetView(View):
         except User.DoesNotExist:
             messages.error(request, 'No user with that email address was found.')
             return redirect('password_reset')
-        send_password_reset_email(user)
+        send_password_reset_email(user, request)
         messages.success(request, 'An email has been sent to your email address with instructions for resetting your password.')
         return redirect('login')
     
@@ -119,31 +119,6 @@ def error_404_view(request, exception):
     # we add the path to the 404.html file
     # here. The name of our HTML file is 404.html
     return render(request, '404.html')
-
-
-# @login_required
-# class ChangePasswordView(View):
-#     form_class = ChangePasswordForm
-#     template_name = 'change_password.html'
-#     success_url = 'password_change_done'
-#
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#
-#     def get(self, request, *args, **kwargs):
-#         form = self.form_class(request.user)
-#         debug_value = 'Form is invalid'
-#         return render(request, self.template_name, {'form': form, 'debug_value': debug_value})
-#
-#     def post(self, request, *args, **kwargs):
-#         form = self.form_class(request.user, request.POST)
-#         if form.is_valid():
-#             user = form.save()
-#             update_session_auth_hash(request, user)  # Important!
-#             return redirect(self.success_url)
-#         response = super().form_invalid(form)
-#         response.context_data['debug_value'] = 'Form is invalid'
-#         return response
 
 
 @method_decorator(login_required, name='dispatch')
