@@ -89,10 +89,14 @@ class IndexView(LoginRequiredMixin, ListView):
         context["total_balance"] = total_balance
         
         today = datetime.today()
-        staffBdays=Staff.objects.filter(user=self.request.user, date_of_birth__month=today.month, date_of_birth__day=today.day)
+        finaluser = self.request.user
+        if self.request.user.is_faculty:
+            staffinstance=Staff.objects.get(email=self.request.user.username)
+            finaluser = staffinstance.user
+        staffBdays=Staff.objects.filter(user=finaluser, date_of_birth__month=today.month, date_of_birth__day=today.day)
         context["staffBdays"]=staffBdays
         
-        events = Calendar.objects.filter(user=self.request.user)
+        events = Calendar.objects.filter(user=finaluser)
         event_list = [{'title': event.title, 'start': str(event.date), 'type': event.type} for event in events]
         context.update({
             'event_list': json.dumps(event_list)
@@ -110,7 +114,8 @@ class SiteConfigView(LoginRequiredMixin, View):
         user = request.user
         custom_user_form = CustomUserForm(instance=user)
         user_profile_form = UserProfileForm(instance=user.userprofile)
-        return render(request, 'corecode/siteconfig.html', {'custom_user_form': custom_user_form, 'user_profile_form': user_profile_form})
+        passport_url = user.userprofile.profile_picture.url if user.userprofile.profile_picture else None
+        return render(request, 'corecode/siteconfig.html', {'custom_user_form': custom_user_form, 'user_profile_form': user_profile_form, 'user_url': passport_url})
 
     def post(self, request):
         if request.user.is_faculty:
@@ -149,7 +154,8 @@ class FacultyProfileView(LoginRequiredMixin, View):
 
         custom_user_form = CustomUserForm(instance=user)
         staff_profile_form = StaffProfileForm(instance=staff)
-        return render(request, 'corecode/facultyprofile.html', {'custom_user_form': custom_user_form, 'staff_profile_form': staff_profile_form})
+        passport_url = staff.passport.url if staff.passport else None
+        return render(request, 'corecode/facultyprofile.html', {'custom_user_form': custom_user_form, 'staff_profile_form': staff_profile_form, 'staff_url': passport_url})
 
     def post(self, request):
         if not request.user.is_faculty:
@@ -200,14 +206,17 @@ class SessionListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
     template_name = "corecode/session_list.html"
 
     def get_queryset(self):
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
         queryset = super().get_queryset()
-        return queryset.filter(user=self.request.user)
+        return queryset.filter(user=finaluser)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["form"] = AcademicSessionForm()
         return context
-
 
 class SessionCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = AcademicSession
@@ -222,12 +231,21 @@ class SessionCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         return context
     
     def get_form_kwargs(self):
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
         kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
+        kwargs['user'] = finaluser
         return kwargs
     
     def form_valid(self, form):
-        form.instance.user = self.request.user
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
+        form.instance.user = finaluser
+        form.instance.current = self.request.POST.get("current") == "checked"
         return super().form_valid(form)
 
 class SessionUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
@@ -238,18 +256,22 @@ class SessionUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     template_name = "corecode/mgt_form.html"
 
     def form_valid(self, form):
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
         obj = self.object
+        form.instance.current = self.request.POST.get("current") == "checked"
         if obj.current == False:
             terms = (
-                AcademicSession.objects.filter(current=True)
+                AcademicSession.objects.filter(user=finaluser, current=True)
                 .exclude(name=obj.name)
                 .exists()
             )
             if not terms:
                 messages.warning(self.request, "You must set a session to current.")
-                return redirect("session-list")
+                return redirect("sessions")
         return super().form_valid(form)
-
 
 class SessionDeleteView(LoginRequiredMixin, DeleteView):
     model = AcademicSession
@@ -270,8 +292,12 @@ class TermListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
     template_name = "corecode/term_list.html"
 
     def get_queryset(self):
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
         queryset = super().get_queryset()
-        return queryset.filter(user=self.request.user)
+        return queryset.filter(user=finaluser)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -287,12 +313,21 @@ class TermCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     success_message = "New term successfully added"
 
     def get_form_kwargs(self):
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
         kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
+        kwargs['user'] = finaluser
         return kwargs
 
     def form_valid(self, form):
-        form.instance.user = self.request.user
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
+        form.instance.user = finaluser
+        form.instance.current = self.request.POST.get("current") == "checked"
         return super().form_valid(form)
 
 class TermUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
@@ -303,16 +338,21 @@ class TermUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     template_name = "corecode/mgt_form.html"
 
     def form_valid(self, form):
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
         obj = self.object
+        form.instance.current = self.request.POST.get("current") == "checked"
         if obj.current == False:
             terms = (
-                AcademicTerm.objects.filter(current=True)
+                AcademicTerm.objects.filter(user=finaluser, current=True)
                 .exclude(name=obj.name)
                 .exists()
             )
             if not terms:
                 messages.warning(self.request, "You must set a term to current.")
-                return redirect("term")
+                return redirect("terms")
         return super().form_valid(form)
 
 class TermDeleteView(LoginRequiredMixin, DeleteView):
@@ -334,8 +374,12 @@ class ClassListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
     template_name = "corecode/class_list.html"
 
     def get_queryset(self):
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
         # Retrieve the classes for the current logged-in user
-        queryset = super().get_queryset().filter(user=self.request.user)
+        queryset = super().get_queryset().filter(user=finaluser)
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -351,8 +395,12 @@ class ClassCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     success_message = "New class successfully added"
 
     def form_valid(self, form):
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
         try:
-            form.instance.user = self.request.user
+            form.instance.user = finaluser
             return super().form_valid(form)
         except IntegrityError:
             form.add_error('name', 'Class with this name already exists')
@@ -365,8 +413,12 @@ class ClassUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     success_message = "class successfully updated."
     template_name = "corecode/mgt_form.html"
     def form_valid(self, form):
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
         try:
-            form.instance.user = self.request.user
+            form.instance.user = finaluser
             return super().form_valid(form)
         except IntegrityError:
             form.add_error('name', 'Class with this name already exists')
@@ -388,8 +440,12 @@ class SubjectListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
     template_name = "corecode/subject_list.html"
 
     def get_queryset(self):
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
         queryset = super().get_queryset()
-        return queryset.filter(user=self.request.user)
+        return queryset.filter(user=finaluser)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -405,12 +461,20 @@ class SubjectCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     success_message = "New subject successfully added"
 
     def get_form_kwargs(self):
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
         kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
+        kwargs['user'] = finaluser
         return kwargs
 
     def form_valid(self, form):
-        form.instance.user = self.request.user
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
+        form.instance.user = finaluser
         return super().form_valid(form)
 
 class SubjectUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
@@ -420,7 +484,11 @@ class SubjectUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     success_message = "Subject successfully updated."
     template_name = "corecode/mgt_form.html"
     def form_valid(self, form):
-        form.instance.user = self.request.user
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
+        form.instance.user = finaluser
         return super().form_valid(form)
 
 class SubjectDeleteView(LoginRequiredMixin, DeleteView):
@@ -443,6 +511,9 @@ class CurrentSessionAndTermView(LoginRequiredMixin, View):
     success_message = "Current Session/term updated successfully."
 
     def get(self, request, *args, **kwargs):
+        if self.request.user.is_faculty:
+            message = "You don't have access to this page."
+            return HttpResponse(message)
         current_session = AcademicSession.objects.filter(user=request.user, current=True).first()
         current_term = AcademicTerm.objects.filter(user=request.user, current=True).first()
 
@@ -454,7 +525,6 @@ class CurrentSessionAndTermView(LoginRequiredMixin, View):
             }
         )
         return render(request, self.template_name, {"form": form})
-
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)

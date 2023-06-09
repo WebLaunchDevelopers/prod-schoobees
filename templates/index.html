@@ -80,6 +80,7 @@
   }
 </style>
 
+{% if not user.is_faculty %}
   <div class="container-fluid mt-5">
     <div class="row">
       <div class="col-md-3">
@@ -136,6 +137,7 @@
       </div>
     </div>
   </div>
+  {% endif %}
   <div class="d-flex">
     <div class="float-left">
       <div class="container-fluid mt-5">
@@ -260,6 +262,7 @@
               </a>
             </div>
           </div>
+          {% if not user.is_faculty %}
           <div class="col-md-6 mt-4">
             <div class="card dashboard-card">
               <a href="{% url 'feedback-list' %}">
@@ -272,6 +275,7 @@
               </a>
             </div>
           </div>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -290,6 +294,7 @@
         </div>
       </div>    
     </div>
+
   </div>
   <script>
     $(document).ready(function() {
@@ -312,9 +317,9 @@
             // element.css('color', 'white');
             // element.css('font-weight', 'bold');
           if (event.type == 'event') {
-          startCell.css('background-color', '#f1f8ff');
+          startCell.css('background-color', '#A18648');
         } else if (event.type == 'holiday') {
-          startCell.css('background-color', '#e6f1fc');
+          startCell.css('background-color', '#4863A0');
         }
           element.css('display', 'none');
           element.empty()
@@ -324,7 +329,7 @@
           var today = moment();
           var momentDate = moment(date); // create a moment object from the date parameter
           if (momentDate.isSame(today, 'day')) {
-          cell.css('background-color', '#e0f8f7');
+          cell.css('background-color', '#A14863');
         }
         },
         dayClick: function(date, jsEvent, view) {

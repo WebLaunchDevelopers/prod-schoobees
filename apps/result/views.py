@@ -14,30 +14,39 @@ from django.views.generic import ListView, View
 from django.urls import reverse_lazy
 from django.urls import reverse
 from django.utils import timezone
+from apps.staffs.models import Staff
 
 class CreateResultView(LoginRequiredMixin, View):
     def get(self, request):
-        current_session = AcademicSession.objects.filter(user=self.request.user, current=True).first()
-        current_term = AcademicTerm.objects.filter(user=self.request.user, current=True).first()
-        form = CreateResults(user=request.user, initial={'session': current_session, 'term': current_term})
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
+        current_session = AcademicSession.objects.filter(user=finaluser, current=True).first()
+        current_term = AcademicTerm.objects.filter(user=finaluser, current=True).first()
+        form = CreateResults(user=finaluser, initial={'session': current_session, 'term': current_term})
         return render(request, "result/create_result_page2.html", {"form": form})
 
     def post(self, request):
-        current_session = AcademicSession.objects.filter(user=self.request.user, current=True).first()
-        current_term = AcademicTerm.objects.filter(user=self.request.user, current=True).first()
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
+        current_session = AcademicSession.objects.filter(user=finaluser, current=True).first()
+        current_term = AcademicTerm.objects.filter(user=finaluser, current=True).first()
 
-        form = CreateResults(request.POST, user=request.user, initial={'session': current_session, 'term': current_term})
+        form = CreateResults(request.POST, user=finaluser, initial={'session': current_session, 'term': current_term})
         if form.is_valid():
             class_name = form.cleaned_data["class_name"]
             subject = form.cleaned_data["subjects"]
             exam = form.cleaned_data["exam"]
             results = []
 
-            for student in Student.objects.filter(user=request.user, current_class=class_name):
-                check = Result.objects.filter(user=request.user, current_class=class_name, subject=subject, student=student, exam=exam, session=current_session, term=current_term).first()
+            for student in Student.objects.filter(user=finaluser, current_class=class_name):
+                check = Result.objects.filter(user=finaluser, current_class=class_name, subject=subject, student=student, exam=exam, session=current_session, term=current_term).first()
                 if not check:
                     result = Result(
-                        user=request.user,
+                        user=finaluser,
                         current_class=class_name,
                         subject=subject,
                         student=student,
@@ -56,10 +65,14 @@ class CreateResultView(LoginRequiredMixin, View):
 
 class EditResultsView(LoginRequiredMixin, View):
     def get(self, request):
+        finaluser = request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
         classid = request.GET.get("classid")
         subjectid = request.GET.get("subjectid")
         examid = request.GET.get("examid")
-        results = Result.objects.filter(user=request.user, current_class=classid, subject=subjectid, exam=examid)
+        results = Result.objects.filter(user=finaluser, current_class=classid, subject=subjectid, exam=examid)
         formset = EditResults(queryset=results)
         records = False
         if results.exists():
@@ -83,25 +96,35 @@ class EditResultsView(LoginRequiredMixin, View):
             redirect_url += f"?classid={classid}&subjectid={subjectid}&examid={examid}"
             return redirect(redirect_url)
 
-
 class GetResultsView(LoginRequiredMixin, View):
     def get(self, request):
         class_id = request.GET.get("class_id")
         exam_id = request.GET.get("exam_id")
+        subject_id = request.GET.get("subject_id")
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
 
-        current_session = AcademicSession.objects.filter(user=self.request.user, current=True).first()
-        current_term = AcademicTerm.objects.filter(user=self.request.user, current=True).first()
+        current_session = AcademicSession.objects.filter(user=finaluser, current=True).first()
+        current_term = AcademicTerm.objects.filter(user=finaluser, current=True).first()
 
-        results = Result.objects.filter(user=request.user, session=current_session, term=current_term)
+        results = Result.objects.filter(user=finaluser, session=current_session, term=current_term)
+        exams = Exam.objects.filter(user=finaluser, session=current_session, term=current_term)
 
         if class_id:
             results = results.filter(current_class_id=class_id)
 
         if exam_id:
             results = results.filter(exam_id=exam_id)
+        elif exams.exists():
+            results = results.filter(exam_id=exams.first().id)
 
-        classes = StudentClass.objects.filter(user=request.user)
-        exams = Exam.objects.filter(user=request.user, session=current_session, term=current_term)
+        if subject_id:
+            results = results.filter(subject_id=subject_id)
+
+        classes = StudentClass.objects.filter(user=finaluser)
+        filter_subject = Subject.objects.filter(user=finaluser)
         resultss = {}
         has_records = False
 
@@ -120,18 +143,39 @@ class GetResultsView(LoginRequiredMixin, View):
 
                 for subject in subjects:
                     result = results.filter(current_class=eachclass, student=student, subject=subject).first()
+                    gradepoint = result.grade()
                     if result:
                         count += 1
                         total_score += result.exam_score
+
                 percent = round(((total_score / (count * 100)) * 100), 1)
+                if subject_id:
+                    total_score = gradepoint
                 students.append({"student": student, "total_score": total_score, "percent": percent})
 
             if subjects or students:
                 has_records = True
-                resultss[eachclass] = {"exam": None, "subjects": subjects, "students": students}
+                class_students = []
+                for student_data in students:
+                    if student_data["student"] not in [s["student"] for s in class_students]:
+                        class_students.append(student_data)
+                    else:
+                        continue
 
-        return render(request, "result/all_results.html",
-                      {"results": results, "student_classes": classes, "exams": exams, "resultss": resultss, "has_records": has_records})
+                resultss[eachclass] = {"exam": None, "students": class_students, "subjects": subjects}
+
+        return render(
+            request,
+            "result/all_results.html",
+            {
+                "results": results,
+                "student_classes": classes,
+                "exams": exams,
+                "filter_subject": filter_subject,
+                "resultss": resultss,
+                "has_records": has_records,
+            },
+        )
 
 class ExamsListView(LoginRequiredMixin, ListView):
     model = Exam
@@ -139,8 +183,12 @@ class ExamsListView(LoginRequiredMixin, ListView):
     context_object_name = 'exams'
 
     def get_queryset(self):
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
         queryset = super().get_queryset()
-        return queryset.filter(user=self.request.user)
+        return queryset.filter(user=finaluser)
 
 class ExamsCreateView(LoginRequiredMixin, CreateView):
     model = Exam
@@ -150,14 +198,22 @@ class ExamsCreateView(LoginRequiredMixin, CreateView):
     success_message = "Exams added successfully."
 
     def get_form_kwargs(self):
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user        
         kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
+        kwargs['user'] = finaluser
         return kwargs
 
     def post(self, request, *args, **kwargs):
+        finaluser = self.request.user
+        if finaluser.is_faculty:
+            staffrecord = Staff.objects.get(email=finaluser.username)
+            finaluser = staffrecord.user
         form = self.get_form()
         if form.is_valid():
-            form.instance.user = self.request.user
+            form.instance.user = finaluser
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
