@@ -1,18 +1,12 @@
-import csv
 from django.contrib.messages.views import SuccessMessageMixin
 from django.forms import widgets
-from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.http import HttpResponse
-from django.views.generic import DetailView, ListView, View
+from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from apps.base.models import CustomUser
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ValidationError
-
 from .models import Staff
-from io import StringIO
 
 class StaffListView(LoginRequiredMixin, ListView):
     model = Staff
@@ -60,7 +54,7 @@ class StaffCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 
 class StaffUpdateView(SuccessMessageMixin, UpdateView):
     model = Staff
-    fields = ['current_status','first_name','last_name','gender','date_of_birth','email','mobile_number','address','comments', 'passport']
+    fields = ['current_status', 'first_name', 'last_name', 'gender', 'date_of_birth', 'email', 'mobile_number', 'address', 'comments', 'passport']
     success_message = "Record successfully updated."
 
     def get_form(self):

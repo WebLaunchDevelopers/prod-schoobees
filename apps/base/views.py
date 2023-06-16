@@ -1,17 +1,12 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib import messages
-from django.utils import timezone
 from django.views import View
 from .forms import CustomUserCreationForm, LoginForm, UserProfileForm, ChangePasswordForm
 from .utils import send_password_reset_email
 from .models import CustomUser as User
 from django.contrib.auth.views import PasswordResetConfirmView
-from django.views.generic import TemplateView, FormView
-# from django.utils.encoding import force_text
-from django.utils.encoding import force_str
-from django.utils.http import urlsafe_base64_decode
+from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
@@ -23,7 +18,7 @@ class RegisterView(View):
 
     def post(self, request):
         user_form = CustomUserCreationForm(request.POST)
-        profile_form = UserProfileForm(request.POST)
+        profile_form = UserProfileForm(request.POST, request.FILES)
         if user_form.is_valid() and profile_form.is_valid():
             user = user_form.save(commit=False)
             user.save()

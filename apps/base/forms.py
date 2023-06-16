@@ -1,6 +1,5 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
-from django.utils.translation import gettext_lazy as _
 from .models import CustomUser, UserProfile
 
 class CustomUserCreationForm(UserCreationForm):
@@ -14,7 +13,7 @@ class UserProfileForm(forms.ModelForm):
     country = forms.ChoiceField(choices=UserProfile.COUNTRY_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
     class Meta:
         model = UserProfile
-        fields = ('school_name', 'country', 'mobile_number', 'chairman', 'principal', 'address')
+        fields = ('school_name', 'country', 'mobile_number', 'chairman', 'principal', 'address', 'supporting_documents')
 
 
 class LoginForm(AuthenticationForm):
