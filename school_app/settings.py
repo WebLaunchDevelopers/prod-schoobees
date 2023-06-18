@@ -96,16 +96,27 @@ WSGI_APPLICATION = 'school_app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'schoobeesdb',
+# 	'USER': 'schoobeesdbuser',
+# 	'PASSWORD': 'avinashgummadi',
+# 	'HOST': 'localhost',
+# 	'PORT': '',
+#     }
+# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'schoobeesdb',
-	'USER': 'schoobeesdbuser',
-	'PASSWORD': 'avinashgummadi',
-	'HOST': 'localhost',
-	'PORT': '',
+        'NAME': 'database-1',  # DB identifier
+        'USER': 'postgres',  # Master username
+        'PASSWORD': 'avinashgummadi',
+        'HOST': 'database-1.cpdnafjyf3dy.eu-north-1.rds.amazonaws.com',  # Endpoint
+        'PORT': '5432',  # Port
     }
 }
+
 # DATABASES = {
 #     "default": {
 #         "ENGINE": "django.db.backends.sqlite3",
