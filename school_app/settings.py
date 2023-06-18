@@ -109,10 +109,10 @@ WSGI_APPLICATION = 'school_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'database-1',  # DB identifier
-        'USER': 'postgres',  # Master username
+        'NAME': 'schoobeesdb',  # DB identifier
+        'USER': 'schoobeesdbuser',  # Master username
         'PASSWORD': 'avinashgummadi',
-        'HOST': 'database-1.cpdnafjyf3dy.eu-north-1.rds.amazonaws.com',  # Endpoint
+        'HOST': 'schoobeesdb.cpdnafjyf3dy.eu-north-1.rds.amazonaws.com',  # Endpoint
         'PORT': '5432',  # Port
     }
 }
