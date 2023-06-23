@@ -100,20 +100,20 @@ WSGI_APPLICATION = 'school_app.wsgi.application'
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql_psycopg2',
 #         'NAME': 'schoobeesdb',
-# 	'USER': 'schoobeesdbuser',
-# 	'PASSWORD': 'avinashgummadi',
-# 	'HOST': 'localhost',
-# 	'PORT': '',
+#         'USER': 'schoobeesdbuser',
+#         'PASSWORD': 'avinashgummadi',
+#         'HOST': 'localhost',
+#         'PORT': '',
 #     }
 # }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'schoobeesdb',  # DB identifier
-        'USER': 'schoobeesdbuser',  # Master username
-        'PASSWORD': 'avinashgummadi',
-        'HOST': 'schoobeesdb.cpdnafjyf3dy.eu-north-1.rds.amazonaws.com',  # Endpoint
-        'PORT': '5432',  # Port
+        'NAME': config('DBNAME'),  # DB identifier
+        'USER': config('DBUSER'),  # Master username
+        'PASSWORD': config('DBPASSWORD'),
+        'HOST': config('DBHOST'),  # Endpoint
+        'PORT': config('DBPORT'),  # Port
     }
 }
 
