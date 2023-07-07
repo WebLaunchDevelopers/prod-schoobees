@@ -36,13 +36,10 @@ class CreateResultView(LoginRequiredMixin, View):
             subject = form.cleaned_data["subjects"]
             exam = form.cleaned_data["exam"]
             results = []
-            print("class_name class_name class_name class_name: ", class_name)
-            print("subject subject subject subject: ", subject)
-            print("exam exam exam exam: ", exam)
-            print("Student.objects.filter(user=finaluser, current_class=class_name): ", Student.objects.filter(user=finaluser, current_class=class_name))
+
             for student in Student.objects.filter(user=finaluser, current_class=class_name):
                 check = Result.objects.filter(user=finaluser, current_class=class_name, subject=subject, student=student, exam=exam, session=current_session, term=current_term).first()
-                print("check check check check check check: ", check)
+
                 if not check:
                     result = Result(
                         user=finaluser,
@@ -55,7 +52,7 @@ class CreateResultView(LoginRequiredMixin, View):
                         term=current_term,
                     )
                     results.append(result)
-            print("results results results results results: ", results)    
+  
             Result.objects.bulk_create(results)
             redirect_url = reverse("edit-results")
             redirect_url += f"?classid={class_name.id}&subjectid={subject.id}&examid={exam.id}"
