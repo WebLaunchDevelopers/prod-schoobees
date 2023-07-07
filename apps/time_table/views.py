@@ -16,7 +16,9 @@ from apps.staffs.models import Staff
 class TimetableCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     template_name = 'timetable/create_time_table.html'
     success_message = "Timetable created successfully!"
-    form_class = TimetableForm
+
+    def get_form(self, form_class=None):
+        return TimetableForm(user=self.request.user, **self.get_form_kwargs())
 
     def get(self, request):
         finaluser = request.user
@@ -45,7 +47,6 @@ class TimetableCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
             if finaluser.is_faculty:
                 staffrecord = Staff.objects.get(email=finaluser.username)
                 finaluser = staffrecord.user
-            print(finaluser)
             try:
                 current_session = AcademicSession.objects.get(user=finaluser, current=True)
                 current_term = AcademicTerm.objects.get(user=finaluser, current=True)
@@ -92,7 +93,7 @@ class ViewTimeTableView(LoginRequiredMixin, View):
         if finaluser.is_faculty:
             staffrecord = Staff.objects.get(email=finaluser.username)
             finaluser = staffrecord.user
-        print(finaluser)
+
         class_id = request.GET.get('class_id')
         subject_id = request.GET.get('subject_id')
         date = request.GET.get('date') or timezone.now().date()
@@ -131,11 +132,13 @@ class ViewTimeTableView(LoginRequiredMixin, View):
 class TimetableEditView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Timetable
     template_name = 'timetable/create_time_table.html'
-    form_class = TimetableForm
     success_message = "Timetable updated successfully!"
     success_message_delete = "Timetable deleted successfully!"
     success_url = reverse_lazy('timetable_list')  # Replace 'timetable_list' with the URL name of the timetable list view
 
+    def get_form(self, form_class=None):
+        return TimetableForm(user=self.request.user, **self.get_form_kwargs())
+    
     def form_valid(self, form):
         messages.success(self.request, self.success_message)
         return super().form_valid(form)

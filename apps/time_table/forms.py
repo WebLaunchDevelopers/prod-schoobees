@@ -16,8 +16,7 @@ class TimetableForm(forms.ModelForm):
         model = Timetable
         fields = ['class_of', 'subject', 'topic', 'start_time', 'end_time', 'date']
 
-    def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)
+    def __init__(self, *args,user=None ,**kwargs):
         super().__init__(*args, **kwargs)
         self.fields["class_of"].empty_label = "Select One Class"
         self.fields["subject"].empty_label = "Select One Class"

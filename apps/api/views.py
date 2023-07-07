@@ -55,7 +55,6 @@ class DriverAPIView(APIView):
         hash_object = sha256(text)
         # Convert the hash to a hexadecimal string
         token = hash_object.hexdigest()
-        print(token)
 
         driver_id = request.query_params.get('driver_auth')
 
@@ -125,7 +124,6 @@ class DriverListAPIView(APIView):
         hash_object = sha256(text)
         # Convert the hash to a hexadecimal string
         token = hash_object.hexdigest()
-        print(token)
 
         # Check if registerid is present in query params
         register_id = request.query_params.get('registerid')
@@ -180,7 +178,6 @@ class DriverLocationAPIView(APIView):
         hash_object = sha256(text)
         # Convert the hash to a hexadecimal string
         token = hash_object.hexdigest()
-        print(token)
 
         # Check if registerid is present in query params
         register_id = request.data.get('registerid')
@@ -268,7 +265,6 @@ class DriverMapAPIView(APIView):
         hash_object = sha256(text)
         # Convert the hash to a hexadecimal string
         token = hash_object.hexdigest()
-        print(token)
 
         driver_id = request.query_params.get('driver_auth')
 
@@ -359,7 +355,6 @@ class StudentAPIView(APIView):
         hash_object = sha256(text)
         # Convert the hash to a hexadecimal string
         token = hash_object.hexdigest()
-        print(token)
 
         # Check if studentid is present in query params
         student_id = request.query_params.get('studentid')
@@ -447,7 +442,6 @@ class StudentCreateAPIView(APIView):
         hash_object = sha256(text)
         # Convert the hash to a hexadecimal string
         token = hash_object.hexdigest()
-        print(token)
 
         check_result = self.check_post_params(request)
         if check_result:
@@ -660,7 +654,6 @@ class InvoiceAPIView(APIView):
         hash_object = sha256(text)
         # Convert the hash to a hexadecimal string
         token = hash_object.hexdigest()
-        print(token)
 
         # Check if studentid is present in query params
         student_id = request.data.get('studentid')
@@ -1060,7 +1053,6 @@ class CalendarAPIView(APIView):
         hash_object = sha256(text)
         # Convert the hash to a hexadecimal string
         token = hash_object.hexdigest()
-        print(token)
 
         # Check if registerid is present in query params
         register_id = request.query_params.get('registerid')
@@ -1115,7 +1107,6 @@ class PerformanceAPIView(APIView):
         hash_object = sha256(text)
         # Convert the hash to a hexadecimal string
         token = hash_object.hexdigest()
-        print(token)
 
         # Check if registerid is present in query params
         register_id = request.query_params.get('registerid')
@@ -1243,7 +1234,6 @@ class NotificationAPIView(APIView):
         hash_object = sha256(text)
         # Convert the hash to a hexadecimal string
         token = hash_object.hexdigest()
-        print(token)
 
         # Check if studentid is present in query params
         student_id = request.query_params.get('studentid')
@@ -1330,7 +1320,6 @@ class AttendanceAPIView(APIView):
         hash_object = sha256(text)
         # Convert the hash to a hexadecimal string
         token = hash_object.hexdigest()
-        print(token)
 
         # Check if studentid is present in query params
         student_id = request.query_params.get('studentid')
@@ -1428,7 +1417,6 @@ class TimetableAPIView(APIView):
         hash_object = sha256(text)
         # Convert the hash to a hexadecimal string
         token = hash_object.hexdigest()
-        print(token)
 
         # Check if registerid is present in query params
         register_id = request.query_params.get('registerid')
@@ -1516,7 +1504,6 @@ class ExamsListAPIView(APIView):
         hash_object = sha256(text)
         # Convert the hash to a hexadecimal string
         token = hash_object.hexdigest()
-        print(token)
 
         # Check if registerid is present in query params
         register_id = request.query_params.get('registerid')
@@ -1573,7 +1560,6 @@ class SubjectsListAPIView(APIView):
         hash_object = sha256(text)
         # Convert the hash to a hexadecimal string
         token = hash_object.hexdigest()
-        print(token)
 
         # Check if registerid is present in query params
         register_id = request.query_params.get('registerid')
@@ -1630,7 +1616,6 @@ class ClassListAPIView(APIView):
         hash_object = sha256(text)
         # Convert the hash to a hexadecimal string
         token = hash_object.hexdigest()
-        print(token)
 
         # Check if registerid is present in query params
         register_id = request.query_params.get('registerid')
@@ -1687,7 +1672,6 @@ class RouteDeleteAPIView(APIView):
         hash_object = sha256(text)
         # Convert the hash to a hexadecimal string
         token = hash_object.hexdigest()
-        print(token)
 
         # Check if registerid is present in query params
         register_id = request.query_params.get('registerid')
@@ -1765,7 +1749,6 @@ class RouteNodeDeleteAPIView(APIView):
         hash_object = sha256(text)
         # Convert the hash to a hexadecimal string
         token = hash_object.hexdigest()
-        print(token)
 
         # Check if registerid is present in query params
         register_id = request.query_params.get('registerid')

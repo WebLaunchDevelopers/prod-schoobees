@@ -106,6 +106,7 @@ WSGI_APPLICATION = 'school_app.wsgi.application'
 #         'PORT': '',
 #     }
 # }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',

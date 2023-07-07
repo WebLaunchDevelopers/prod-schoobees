@@ -39,6 +39,7 @@ class CreateResultView(LoginRequiredMixin, View):
 
             for student in Student.objects.filter(user=finaluser, current_class=class_name):
                 check = Result.objects.filter(user=finaluser, current_class=class_name, subject=subject, student=student, exam=exam, session=current_session, term=current_term).first()
+                print("check check check check check check: ", check)
                 if not check:
                     result = Result(
                         user=finaluser,
@@ -51,7 +52,7 @@ class CreateResultView(LoginRequiredMixin, View):
                         term=current_term,
                     )
                     results.append(result)
-
+            print("results results results results results: ", results)    
             Result.objects.bulk_create(results)
             redirect_url = reverse("edit-results")
             redirect_url += f"?classid={class_name.id}&subjectid={subject.id}&examid={exam.id}"
@@ -209,7 +210,15 @@ class ExamsCreateView(LoginRequiredMixin, CreateView):
         form = self.get_form()
         if form.is_valid():
             form.instance.user = finaluser
-            return self.form_valid(form)
+            session = AcademicSession.objects.filter(current=True, user=finaluser).first()
+            term = AcademicTerm.objects.filter(current=True, user=finaluser).first()
+            if session and term:
+                form.instance.session = session
+                form.instance.term = term
+                return self.form_valid(form)
+            else:
+                messages.error(self.request, "Cannot add exam. Please make sure there is a current session and term set.")
+                return redirect('exams_create')
         else:
             return self.form_invalid(form)
 
